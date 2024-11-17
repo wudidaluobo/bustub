@@ -11,6 +11,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "buffer/buffer_pool_manager.h"
+#include "common/config.h"
 
 namespace bustub {
 
@@ -26,7 +27,8 @@ FrameHeader::FrameHeader(frame_id_t frame_id) : frame_id_(frame_id), data_(BUSTU
 /**
  * @brief Get a raw const pointer to the frame's data.
  *
- * @return const char* A pointer to immutable data that the frame stores.
+ * @return const char* A pointer to 
+  data that the frame stores.
  */
 auto FrameHeader::GetData() const -> const char * { return data_.data(); }
 
@@ -70,7 +72,7 @@ BufferPoolManager::BufferPoolManager(size_t num_frames, DiskManager *disk_manage
                                      LogManager *log_manager)
     : num_frames_(num_frames),
       next_page_id_(0),
-      bpm_latch_(std::make_shared<std::mutex>()),
+      bpm_latch_(std::make_shared<std::mutex>()),//make_shared 创建一个指向mutex的shared_ptr
       replacer_(std::make_shared<LRUKReplacer>(num_frames, k_dist)),
       disk_scheduler_(std::make_unique<DiskScheduler>(disk_manager)),
       log_manager_(log_manager) {
@@ -81,6 +83,7 @@ BufferPoolManager::BufferPoolManager(size_t num_frames, DiskManager *disk_manage
   next_page_id_.store(0);
 
   // Allocate all of the in-memory frames up front.
+  //预分配内存
   frames_.reserve(num_frames_);
 
   // The page table should have exactly `num_frames_` slots, corresponding to exactly `num_frames_` frames.
@@ -88,6 +91,8 @@ BufferPoolManager::BufferPoolManager(size_t num_frames, DiskManager *disk_manage
 
   // Initialize all of the frame headers, and fill the free frame list with all possible frame IDs (since all frames are
   // initially free).
+
+  //frame_id是从0开始
   for (size_t i = 0; i < num_frames_; i++) {
     frames_.push_back(std::make_shared<FrameHeader>(i));
     free_frames_.push_back(static_cast<int>(i));
@@ -122,7 +127,9 @@ auto BufferPoolManager::Size() const -> size_t { return num_frames_; }
  *
  * @return The page ID of the newly allocated page.
  */
-auto BufferPoolManager::NewPage() -> page_id_t { UNIMPLEMENTED("TODO(P1): Add implementation."); }
+auto BufferPoolManager::NewPage() -> page_id_t { 
+   return next_page_id_.fetch_add(1);
+ }
 
 /**
  * @brief Removes a page from the database, both on disk and in memory.
@@ -150,7 +157,9 @@ auto BufferPoolManager::NewPage() -> page_id_t { UNIMPLEMENTED("TODO(P1): Add im
  * @param page_id The page ID of the page we want to delete.
  * @return `false` if the page exists but could not be deleted, `true` if the page didn't exist or deletion succeeded.
  */
-auto BufferPoolManager::DeletePage(page_id_t page_id) -> bool { UNIMPLEMENTED("TODO(P1): Add implementation."); }
+auto BufferPoolManager::DeletePage(page_id_t page_id) -> bool {
+
+ }
 
 /**
  * @brief Acquires an optional write-locked guard over a page of data. The user can specify an `AccessType` if needed.
@@ -192,7 +201,7 @@ auto BufferPoolManager::DeletePage(page_id_t page_id) -> bool { UNIMPLEMENTED("T
  * returns `std::nullopt`, otherwise returns a `WritePageGuard` ensuring exclusive and mutable access to a page's data.
  */
 auto BufferPoolManager::CheckedWritePage(page_id_t page_id, AccessType access_type) -> std::optional<WritePageGuard> {
-  UNIMPLEMENTED("TODO(P1): Add implementation.");
+  //page可能在内存中，也可能不在内存中
 }
 
 /**

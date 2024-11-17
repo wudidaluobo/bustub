@@ -26,6 +26,9 @@ namespace bustub {
  */
 struct DiskRequest {
   /** Flag indicating whether the request is a write or a read. */
+  //构造函数加explicit可以禁止隐式转换，即通过对应的属性值生成对象
+
+  DiskRequest(DiskRequest&&) = default;      // 移动构造函数 
   bool is_write_;
 
   /**
@@ -81,7 +84,9 @@ class DiskScheduler {
    *
    * @return std::promise<bool>
    */
-  auto CreatePromise() -> DiskSchedulerPromise { return {}; };
+  auto CreatePromise() -> DiskSchedulerPromise { 
+    DiskSchedulerPromise p;
+    return p; };
 
   /**
    * @brief Increases the size of the database file to fit the specified number of pages.
@@ -102,7 +107,7 @@ class DiskScheduler {
    */
   void DeallocatePage(page_id_t page_id) { disk_manager_->DeletePage(page_id); }
 
- private:
+ private: 
   /** Pointer to the disk manager. */
   DiskManager *disk_manager_ __attribute__((__unused__));
   /** A shared queue to concurrently schedule and process requests. When the DiskScheduler's destructor is called,

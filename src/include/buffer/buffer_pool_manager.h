@@ -79,6 +79,7 @@ class FrameHeader {
   std::atomic<size_t> pin_count_;
 
   /** @brief The dirty flag. */
+  //标记是否被修改
   bool is_dirty_;
 
   /**
@@ -140,6 +141,7 @@ class BufferPoolManager {
   std::shared_ptr<std::mutex> bpm_latch_;
 
   /** @brief The frame headers of the frames that this buffer pool manages. */
+  //理解为一个指针数组
   std::vector<std::shared_ptr<FrameHeader>> frames_;
 
   /** @brief The page table that keeps track of the mapping between pages and buffer pool frames. */
@@ -148,6 +150,7 @@ class BufferPoolManager {
   /** @brief A list of free frames that do not hold any page's data. */
   std::list<frame_id_t> free_frames_;
 
+  //shared_ptr与unique_ptr的区别在于持有的唯一性与否
   /** @brief The replacer to find unpinned / candidate pages for eviction. */
   std::shared_ptr<LRUKReplacer> replacer_;
 
